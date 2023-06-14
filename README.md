@@ -22,6 +22,18 @@ What Do We Need?
  
  - Kubernetes : To kubectl the commands to access our pods and deployment.
 
+## Prerequisites!
+
+- AWS Account
+
+- Programmatic access and AWS configured with CLI
+
+- Python3 Installed
+
+- Docker and Kubectl Installed
+
+- Code editor
+
 ## Create a monitoring application using Flask
 
 Create the Python Apllication using the "app.py" provided in the files section
@@ -142,6 +154,129 @@ Step 3. Once you run all the commands in proper order the DockerImage will be pu
 ![Latest Image](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/a643ed04-cf71-4a4c-88b8-9e56a395cd84)
 
 Hence uptil now the DockerImage is successfully pushed into you ECR.
+
+
+## Creating the EKS cluster and Node Groups
+
+You need to create a EKS Cluster and Nodes group in order to deploy your container in form of Kubernetes container.
+
+Step 1. Create a EKS Cluster of your own and make sure to create a new Security Group with Port 5000 enabled.
+
+![Security-group](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/551bcb31-2113-49f7-8b51-8c9148fb0d66)
+
+Make sure to select the security group you created in step 2 while configuring your EKS Cluster.
+
+![select-sg](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/c3c45bb1-a5e7-481d-80af-4b872208aa56)
+
+Step 2. Create a Node Group with 2 nodes having Instance of tyoe "t2.micro".
+
+## Creating the Deployment and Service for kubernetes deployment.
+
+Step 1. Create the Deployment file
+
+```bash
+deployment = client.V1Deployment(
+    metadata=client.V1ObjectMeta(name="my-flask-app"),
+    spec=client.V1DeploymentSpec(
+        replicas=1,
+        selector=client.V1LabelSelector(
+            match_labels={"app": "my-flask-app"}
+        ),
+        template=client.V1PodTemplateSpec(
+            metadata=client.V1ObjectMeta(
+                labels={"app": "my-flask-app"}
+            ),
+            spec=client.V1PodSpec(
+                containers=[
+                    client.V1Container(
+                        name="my-flask-container",
+                        image="{imageUri}",
+                        ports=[client.V1ContainerPort(container_port=5000)]
+                    )
+                ],
+                image_pull_secrets=[
+                    client.V1LocalObjectReference(name="regcred")
+                ]
+            )
+        )
+    )
+)
+
+# Create the deployment
+api_instance = client.AppsV1Api(api_client)
+api_instance.create_namespaced_deployment(
+    namespace="default",
+    body=deployment
+)
+```
+
+Step 2. Create The Service 
+```bash
+service = client.V1Service(
+    metadata=client.V1ObjectMeta(name="my-flask-service"),
+    spec=client.V1ServiceSpec(
+        selector={"app": "my-flask-app"},
+        ports=[client.V1ServicePort(port=5000)]
+    )
+)
+
+# Create the service
+api_instance = client.CoreV1Api(api_client)
+api_instance.create_namespaced_service(
+    namespace="default",
+    body=service
+)
+```
+
+Run the above "eks.py" file containing the deployment and service in default namespace using command :
+```bash
+python3 eks.py
+```
+
+#### Important : In order for authentication for the image which is on ECR private registry you need to create the "secret" file inside the k8s cluster which have necessary information regarding your EKS cluster for authentication purpose. And you need to call the secret file using the following block of code in your deployment file or else the Container will show "ImagePullBackOff" error.
+```bash
+image_pull_secrets=[
+                    client.V1LocalObjectReference(name="<your-secret-file-name>")
+]
+```
+
+Once you have authenticated with your Private Registry you can see the Container creating by using the following command :
+
+``bash
+kubectl get pods -n default -w
+
+kubectl get deployment -n default
+
+kubectl get svc -n default
+```
+
+-n : To indicate default namespace
+
+-w : To view in watch mode
+
+You can refer the below snapshot of terminal for verifying your kubectl commands
+
+![image](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/b50d1add-75a9-487e-9cad-28b7385d568e)
+
+Once your pod is up and running, run the port-forward to expose the service using the command 
+
+```bash
+kubectl port-forward svc/{your-service-name} 5000:5000
+```
+And now if you upen your Localhost then you'll see the Application successfully hosted on Kubernetes
+
+![image](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/8d2a67dc-f6c2-4e43-b8c6-f1af148e7c13)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
