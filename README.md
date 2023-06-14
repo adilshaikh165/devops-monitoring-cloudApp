@@ -242,7 +242,7 @@ image_pull_secrets=[
 
 Once you have authenticated with your Private Registry you can see the Container creating by using the following command :
 
-``bash
+```bash
 kubectl get pods -n default -w
 
 kubectl get deployment -n default
