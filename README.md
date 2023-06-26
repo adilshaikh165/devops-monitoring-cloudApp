@@ -10,6 +10,9 @@ As we go through the project, we will discuss the services in detail and point t
 
 ![Aws file](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/a905c359-4657-4fd4-965a-ff4e7ed59c14)
 
+# Blog post for step by step Demonstration!
+
+https://adilshaikh165.hashnode.dev/cloud-native-monitoring-application
 
 ## Prerequisites!
 
@@ -143,7 +146,6 @@ kubectl port-forward svc/{your-service-name} 5000:5000
 ```
 And now if you upen your Localhost then you'll see the Application successfully hosted on Kubernetes
 
-![image](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/8d2a67dc-f6c2-4e43-b8c6-f1af148e7c13)
 
 
 
