@@ -49,7 +49,7 @@ The Application will look like this when it's successfully run on your local mac
 
 ![customized](https://github.com/adilshaikh165/devops-monitoring-cloudApp/assets/98637502/a0506077-81c8-4772-a71e-1feba7358314)
 
-## Dockerised The Application
+## Dockerised The Application. Automating Dockerfile Vulnerability Scanning in GitHub Actions Using Snyk and CodeQL.
 
 Step 1. To Dockerised the Application you need to create the DockerFile.
 The Python base image used in the Docker file is "python:3.9-slim-buster".
